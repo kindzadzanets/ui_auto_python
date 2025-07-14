@@ -1,0 +1,30 @@
+from playwright.sync_api import sync_playwright, expect
+
+with sync_playwright() as p: # команда python (with), предназначенная для работы с контекстным менеджером*
+    # эта команда открывает что-то: браузер, файл и т.д. и гарантирует, 
+    # что это будет закрыто корректно даже при возникновении ошибки. 
+    # Далее - функция, запускающая плейрайт, т.е. возвращающая объект - контекстный менеджер*, который сохраняется в переменную "р"
+    chromi = p.chromium.launch(headless=False) # запуск функции launch с аргументом headless=False для объекта chromium, 
+    # который является атрибутом для объекта р.
+    # headless - означает "запустить в памяти машины" - без UI. короче говоря был создан объект chromi - браузер, который вернулся в методе лаунч
+    page = chromi.new_page() # создание объекта новой страницы в браузере, которая вернулась в методе new_page
+    page.goto("https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/auth/login") # вызов метода goto и передача в него ссылки
+
+    email_input = page.locator('//div[@data-testid="login-form-email-input"]//div//input') # создание обекта поля имеил, 
+    # который возвращает метод .locator(...) по указанному локатору(пути), на созданном ранее по ссылке объекте страницы
+    email_input.fill("agapramon@gmail.com") # вызов метода .fill(...), который принимает текст и вставляет его в окно
+
+    password_input = page.locator('//div[@data-testid="login-form-password-input"]//div//input')
+    password_input.fill("123321")
+
+    button = page.locator('//*[@id="login-page-login-button"]')
+    button.click()
+
+    alert = page.locator('//div[@data-testid="login-page-wrong-email-or-password-alert"]//div[@class="MuiAlert-message css-1xsto0d"]')
+    
+    expect(alert).to_be_visible() # expect принимает alert в качестве аргумента, созданный по локатору объект и проверяет его состояние указанным методом .to_be_visible()
+    # "ожидаю, что объект страницы - видимый"
+    expect(alert).to_have_text("Wrong email or password 1")
+
+    page.wait_for_timeout(5000) # задан таймаут для страницы, чтобы просто она не закрылась сразу после вставки. ДЛЯ ТРЕНЕРОВКИ
+
