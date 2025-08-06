@@ -1,5 +1,8 @@
+import pytest
 from playwright.sync_api import sync_playwright, expect
 
+@pytest.mark.regression
+@pytest.mark.login
 def test_unsuccessfull_authorization():
     with sync_playwright() as p:
         browser = p.firefox.launch(headless=False)
@@ -15,5 +18,3 @@ def test_unsuccessfull_authorization():
         button.click()
 
         page.wait_for_timeout(5000)
-
-test_unsuccessfull_authorization()
